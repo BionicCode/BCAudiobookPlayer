@@ -1,0 +1,6 @@
+<!-- Converted from svg with ViewerSvg and Ab2d.ReaderSvg -->
+<!-- Created with evaluation version for evaluation purpose only! NOT FOR COMMERCIAL USE! -->
+<Canvas xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation" xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml" Width="36" Height="36">
+    <Canvas/>
+    <Path Fill="Black" StrokeThickness="1" Data="F1M35,0L1,0C0.448,0,0,0.447,0,1L0,35C0,35.553,0.448,36,1,36L35,36C35.552,36,36,35.553,36,35L36,1C36,0.447,35.552,0,35,0z M34,34L2,34 2,2 34,2 34,34z"/>
+</Canvas>

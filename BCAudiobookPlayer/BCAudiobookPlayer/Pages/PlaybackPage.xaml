@@ -1,0 +1,352 @@
+﻿<Page
+    x:Class="BCAudiobookPlayer.Pages.PlaybackPage"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    xmlns:controls="using:BCAudiobookPlayer.Controls"
+    xmlns:converter="using:BCAudiobookPlayer.Converter"
+    mc:Ignorable="d"
+    Background="{ThemeResource ApplicationPageBackgroundThemeBrush}">
+
+    <Grid>
+    <StackPanel>
+      <Image Source="{Binding Source={StaticResource MainPageViewModel}, Path=LastPlayedFile.Tag.CoverArt}" />
+      <Grid>
+        <Grid Grid.Row="1"
+              Grid.Column="1"
+              Margin="32,16,0,0"
+              HorizontalAlignment="Stretch"
+              VerticalAlignment="Stretch">
+          <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="Auto" />
+            <ColumnDefinition Width="*" />
+            <ColumnDefinition Width="Auto" />
+          </Grid.ColumnDefinitions>
+          <Grid.RowDefinitions>
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="Auto" />
+          </Grid.RowDefinitions>
+          <StackPanel Grid.Row="0"
+                      Grid.Column="0"
+                      Orientation="Horizontal"
+                      Margin="0,8,0,0">
+            <CommandBar Background="Transparent"
+                        OverflowButtonVisibility="Collapsed"
+                        Margin="0,-12,8,0">
+              <AppBarButton DataContext="{StaticResource CommonPageHandlers}" Click="SetBookmark_OnClick"
+                            ToolTipService.ToolTip="Set bookmark"
+                            CommandParameter="{Binding ElementName=MessageBox}"
+                            VerticalAlignment="Stretch"
+                            Padding="0"
+                            IsCompact="True"
+                            Margin="0,-4,0,0"
+                            Width="48"
+                            Height="48">
+                <AppBarButton.Icon>
+                  <FontIcon FontFamily="{ThemeResource SymbolThemeFontFamily}"
+                            Glyph="&#xEC43;"
+                            Margin="0,0,0,0" />
+
+                </AppBarButton.Icon>
+              </AppBarButton>
+            </CommandBar>
+            <TextBlock
+                Text="{Binding CurrentPosition, Mode=TwoWay, Converter={StaticResource TimeSpanToStringFormatConverter}}"
+                       FontSize="18"
+                       MinWidth="68"
+                       HorizontalTextAlignment="Justify"
+                       HorizontalAlignment="Left"
+                       FontFamily="Calibri Light"
+                       FontWeight="ExtraLight"
+                       VerticalAlignment="Top"
+                       FontStretch="UltraExpanded" />
+            <TextBlock Text="{Binding Duration, Mode=OneWay, Converter={StaticResource TimeSpanToStringFormatConverter}, ConverterParameter=' /'}"
+                       FontSize="18"
+                       MinWidth="72"
+                       HorizontalAlignment="Left"
+                       FontFamily="Calibri Light"
+                       FontWeight="ExtraLight"
+                       VerticalAlignment="Top"
+                       FontStretch="UltraExpanded"
+                       Margin="0,0,0,0" />
+          </StackPanel>
+          <StackPanel Grid.Row="0"
+                      Grid.Column="1"
+                      VerticalAlignment="Stretch"
+                      Margin="16,0,16,0">
+            <controls:Slider Maximum="{Binding Duration, Converter={StaticResource PlaybackProgressConverter}}"
+                             Value="{Binding CurrentPosition, Converter={StaticResource PlaybackProgressConverter}, Mode=OneWay, UpdateSourceTrigger=PropertyChanged}"
+                             Minimum="0"
+                             StepFrequency="1"
+                             HorizontalAlignment="Stretch"
+                             HorizontalContentAlignment="Stretch"
+                             ThumbToolTipValueConverter="{StaticResource PlaybacksProgressToDurationConverter}"
+                             VerticalAlignment="Stretch"
+                             SliderDragCompleted="JumpToPosition_OnDragCompleted" />
+            <CommandBar Margin="0,0,0,0"
+                        IsDynamicOverflowEnabled="True"
+                        Background="Transparent"
+                        HorizontalAlignment="Center"
+                        OverflowButtonVisibility="Collapsed">
+              <CommandBar.Content>
+                <TextBlock x:Name="TextBlock"
+                           Text="{Binding Source={StaticResource MainPageViewModel}, Path=LastPlayedFile, Converter={StaticResource CurrentTrackToTrackSummaryConverter}}"
+                           HorizontalAlignment="Left"
+                           FontSize="12"
+                           FontFamily="Calibri Light"
+                           FontWeight="Thin"
+                           VerticalAlignment="Center"
+                           Margin="0,0,16,0"
+                           FontStretch="UltraExpanded" />
+              </CommandBar.Content>
+              <AppBarToggleButton x:Name="PlaybackButton"
+                                  Width="48"
+                                  Click="PlayFile"
+                                  Label="Play"
+                                  CommandParameter="{x:Bind}"
+                                  Icon="{Binding IsPlaying, Converter={StaticResource PlayImageToggleConverter}, Mode=OneWay}">
+
+              </AppBarToggleButton>
+
+              <AppBarButton Label="Stop"
+                            Click="StopFile"
+                            Width="48"
+                            CommandParameter="{x:Bind Mode=OneWay}"
+                            Icon="Stop" />
+
+              <AppBarButton Label="Previous"
+                            Width="48"
+                            Margin="32,1,1,0"
+                            Click="SkipFileBack"
+                            CommandParameter="{x:Bind Mode=OneWay}"
+                            Icon="Previous" />
+
+              <AppBarButton Label="Next"
+                            Width="48"
+                            Click="SkipFileForward"
+                            CommandParameter="{x:Bind}"
+                            Icon="Next" />
+              <AppBarSeparator />
+              <AppBarToggleButton Width="48"
+                                  Margin="1"
+                                  IsChecked="{x:Bind ViewModel.LastPlayedFile.IsLoopEnabled, Mode=TwoWay}"
+                                  CommandParameter="{x:Bind Mode=OneWay}">
+                <AppBarToggleButton.Icon>
+                  <FontIcon Glyph="&#xEF3B;" />
+                </AppBarToggleButton.Icon>
+              </AppBarToggleButton>
+              <AppBarToggleButton Label="Loop Begin"
+                                  Width="48"
+                                  Click="SetRepeatStartTime_OnClick"
+                                  CommandParameter="{x:Bind Mode=OneWay}">
+                <AppBarToggleButton.Icon>
+                  <FontIcon FontFamily="{ThemeResource SymbolThemeFontFamily}"
+                            Glyph="&#xE819;" />
+                </AppBarToggleButton.Icon>
+              </AppBarToggleButton>
+              <AppBarToggleButton Label="Loop End"
+                                  Width="48"
+                                  Click="SetRepeatStopTime_OnClick"
+                                  CommandParameter="{x:Bind Mode=OneWay}">
+                <AppBarToggleButton.Icon>
+                  <FontIcon Glyph="&#xE81A;" />
+                </AppBarToggleButton.Icon>
+              </AppBarToggleButton>
+              <AppBarSeparator Margin="1" />
+              <AppBarButton Width="48">
+                <AppBarButton.Icon>
+                  <FontIcon Glyph="&#xE7BC;" />
+                </AppBarButton.Icon>
+                <AppBarButton.Flyout>
+                  <Flyout Placement="Left">
+                    <Grid>
+                      <ListView ItemsSource="{Binding Bookmarks, Mode=OneWay}"
+                                ItemTemplate="{StaticResource BookmarksItemTemplate}"
+                                IsItemClickEnabled="True"
+                                ItemClick="PlayBookmark_OnClick">
+                        <ListView.Header>
+                          <Border Background="{ThemeResource SystemControlBackgroundAccentBrush}"
+                                  Padding="16,12,16,0"
+                                  Margin="0,0,0,4">
+                            <TextBlock Text="Bookmarks"
+                                       CharacterSpacing="80"
+                                       Height="56"
+                                       TextWrapping="WrapWholeWords"
+                                       FontSize="36"
+                                       FontFamily="Calibri Light"
+                                       FontWeight="Thin"
+                                       FontStretch="UltraExpanded"
+                                       HorizontalAlignment="Left" />
+                          </Border>
+                        </ListView.Header>
+                      </ListView>
+                    </Grid>
+                  </Flyout>
+                </AppBarButton.Flyout>
+              </AppBarButton>
+            </CommandBar>
+          </StackPanel>
+          <StackPanel Grid.Row="0"
+                      Grid.Column="2"
+                      Orientation="Horizontal">
+            <TextBlock
+                Text="{x:Bind ViewModel.LastPlayedFile.TimeRemaining, Mode=TwoWay, Converter={StaticResource TimeSpanToStringFormatConverter}, ConverterParameter=-}"
+                       FontSize="18"
+                       FontFamily="Calibri Light"
+                       FontWeight="Thin"
+                       HorizontalAlignment="Left"
+                       VerticalAlignment="Top"
+                       FontStretch="UltraExpanded"
+                       MinWidth="68"
+                       HorizontalTextAlignment="Justify"
+                       Margin="0,8,0,0" />
+
+            <CommandBar Background="Transparent"
+                        VerticalAlignment="Top"
+                        OverflowButtonVisibility="Collapsed"
+                        Margin="0,-4,0,0">
+              <AppBarButton x:Name="MainVolumeButton"
+                            Label="Volume"
+                            Margin="8,0,0,0"
+                            Width="48"
+                            VerticalAlignment="Center"
+                            Icon="{Binding Volume, Converter={StaticResource VolumeImageToggleConverter}, Mode=OneWay}">
+                <AppBarButton.Flyout>
+                  <Flyout>
+                    <StackPanel Orientation="Horizontal">
+
+                      <CommandBar Padding="0"
+                                  Background="Transparent"
+                                  OverflowButtonVisibility="Collapsed">
+                        <AppBarToggleButton Label="Volume"
+                                            Width="48"
+                                            IsChecked="{x:Bind ViewModel.LastPlayedFile.IsMuted, Mode=TwoWay}"
+                                            Icon="{Binding Volume, Converter={StaticResource VolumeImageToggleConverter}, Mode=OneWay}" />
+                      </CommandBar>
+                      <Slider Maximum="1.0"
+                              Value="{x:Bind ViewModel.LastPlayedFile.Volume, Mode=TwoWay}"
+                              Minimum="0.0"
+                              StepFrequency="0.01"
+                              TickFrequency="0.25"
+                              TickPlacement="Outside"
+                              ThumbToolTipValueConverter="{StaticResource PercentageFormatConverter}"
+                              Margin="8,8,16,0"
+                              Width="200"
+                              Padding="0"
+                              Height="Auto"
+                              VerticalAlignment="Center" />
+                    </StackPanel>
+                  </Flyout>
+                </AppBarButton.Flyout>
+              </AppBarButton>
+            </CommandBar>
+          </StackPanel>
+        </Grid>
+
+        <StackPanel Grid.Row="0"
+                    Grid.RowSpan="2"
+                    Grid.ColumnSpan="2"
+                    Grid.Column="0"
+                    Margin="0,8,0,0"
+                    Orientation="Horizontal"
+                    VerticalAlignment="Top"
+                    HorizontalAlignment="Right"
+                    Background="Transparent">
+          <Button ToolTipService.ToolTip="Auto set/ complete media tags"
+                  Style="{ThemeResource ButtonRevealStyle}"
+                  Width="48"
+                  BorderThickness="1"
+                  Background="Transparent"
+                  Height="48"
+                  CommandParameter="{x:Bind}"
+                  Click="AutoTagAudiobookPart_OnClick">
+            <Button.Content>
+              <SymbolIcon Symbol="Tag" />
+            </Button.Content>
+          </Button>
+          <Button Style="{ThemeResource ButtonRevealStyle}"
+                  ToolTipService.ToolTip="Jump to chapter"
+                  Width="48"
+                  Height="48"
+                  BorderThickness="1"
+                  Background="Transparent">
+            <Button.Content>
+              <SymbolIcon Symbol="Bookmarks" />
+            </Button.Content>
+            <Button.Flyout>
+              <Flyout Placement="Left">
+                <Grid>
+                  <ListView ItemsSource="{Binding Parts, Converter={StaticResource AudiobookPartsToChapterListConverter}, Mode=OneWay}"
+                            ItemTemplate="{StaticResource AudiobookChapterJumpListDataTemplate}"
+                            IsItemClickEnabled="True"
+                            DataFetchSize="2"
+                            IncrementalLoadingThreshold="10"
+                            ItemClick="JumpToAudiobookChapter_OnClick">
+                    <ListView.Header>
+                      <Border Background="{ThemeResource SystemControlBackgroundAccentBrush}"
+                              Padding="16,12,16,0"
+                              Margin="0,0,0,4">
+                        <TextBlock Text="Chapters"
+                                   CharacterSpacing="80"
+                                   Height="56"
+                                   TextWrapping="WrapWholeWords"
+                                   FontSize="36"
+                                   FontFamily="Calibri Light"
+                                   FontWeight="Thin"
+                                   FontStretch="UltraExpanded"
+                                   HorizontalAlignment="Left" />
+                      </Border>
+                    </ListView.Header>
+                  </ListView>
+                </Grid>
+              </Flyout>
+            </Button.Flyout>
+          </Button>
+          <Button ToolTipService.ToolTip="Remove audiobook from playlist"
+                  Style="{ThemeResource ButtonRevealStyle}"
+                  Width="48"
+                  BorderThickness="1"
+                  Background="Transparent"
+                  Height="48"
+                  CommandParameter="{x:Bind}"
+                  Click="RemovePartFromPlaylist_OnClick">
+            <Button.Content>
+              <SymbolIcon Symbol="Clear" />
+            </Button.Content>
+          </Button>
+        </StackPanel>
+        <ProgressBar Grid.Row="0"
+                     Grid.Column="0"
+                     Grid.ColumnSpan="2"
+                     IsIndeterminate="True"
+                     VerticalAlignment="Top"
+                     Visibility="{x:Bind ViewModel.IsCreatingPlaylistItem, Converter={StaticResource BooleanToVisibilityConverter}, Mode=OneWay}" />
+        <Popup x:Name="MessageBox"
+               Grid.Row="0"
+               Grid.RowSpan="2"
+               Grid.Column="0"
+               Grid.ColumnSpan="2"
+               IsOpen="False"
+               IsLightDismissEnabled="False"
+               HorizontalAlignment="Center"
+               VerticalAlignment="Top">
+          <Popup.ChildTransitions>
+            <TransitionCollection>
+              <PopupThemeTransition />
+            </TransitionCollection>
+          </Popup.ChildTransitions>
+          <Border BorderBrush="{ThemeResource FlyoutBorderThemeBrush}"
+                  Background="{ThemeResource SystemControlBackgroundBaseMediumLowBrush}"
+                  BorderThickness="1"
+                  Opacity="0.9">
+            <TextBlock Text="MESSAGE TO YOU FROM ME"
+                       Padding="16" />
+          </Border>
+        </Popup>
+      </Grid>
+    </StackPanel>
+
+  </Grid>
+</Page>
